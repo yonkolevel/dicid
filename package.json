@@ -9,11 +9,13 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.454",
     "framer-motion": "^12.38.0",
     "leva": "^0.10.1",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "remotion": "^4.0.454",
     "wheel-gestures": "^2.2.48"
   },
   "devDependencies": {

@@ -4,17 +4,19 @@ export type Project = {
   tags: string[];
   client: string;
   videoUrl: string;
+  href?: string;
 };
 
-// TODO(dicid): swap these Pexels placeholder videos for the real project work.
+// Yonko Level is the first real case-study page; the others keep the landing
+// page feeling like a fuller portfolio while their custom project pages are built.
 export const projects: Project[] = [
   {
-    id: "alpha",
-    name: "Alpha",
+    id: "yonko-level",
+    name: "Yonko Level",
     tags: ["Brand Strategy", "Web Design"],
     client: "Yonko Level",
-    videoUrl:
-      "https://videos.pexels.com/video-files/3045163/3045163-hd_1920_1080_25fps.mp4",
+    videoUrl: "/projects/yonko/reel.mp4",
+    href: "/project-yonkolevel",
   },
   {
     id: "beta",
@@ -31,13 +33,5 @@ export const projects: Project[] = [
     client: "Invisible Camera",
     videoUrl:
       "https://videos.pexels.com/video-files/4763824/4763824-uhd_2560_1440_24fps.mp4",
-  },
-  {
-    id: "delta",
-    name: "Delta",
-    tags: ["Brand Strategy", "Editorial"],
-    client: "MIDI Scout",
-    videoUrl:
-      "https://videos.pexels.com/video-files/5649209/5649209-uhd_2560_1440_25fps.mp4",
   },
 ];

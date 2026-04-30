@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { projects } from "@/data/projects";
 import StageVideo from "./StageVideo";
@@ -130,13 +131,23 @@ export default function ProjectsStage() {
           >
             <StageVideo src={project.videoUrl} />
 
-            <div className="absolute top-6 left-6 z-10 flex flex-col gap-1 text-white md:top-8 md:left-8">
-              <span className="text-sm font-black tracking-[0.12em] uppercase md:text-base">
-                {project.name}
-              </span>
-              <span className="text-[10px] font-bold tracking-[0.18em] uppercase opacity-80 md:text-xs">
-                {project.tags.join(" / ")}
-              </span>
+            <div className="absolute top-6 left-6 z-10 flex flex-col gap-3 text-white md:top-8 md:left-8">
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-black tracking-[0.12em] uppercase md:text-base">
+                  {project.name}
+                </span>
+                <span className="text-[10px] font-bold tracking-[0.18em] uppercase opacity-80 md:text-xs">
+                  {project.tags.join(" / ")}
+                </span>
+              </div>
+              {project.href && (
+                <Link
+                  href={project.href}
+                  className="w-fit border border-white/70 px-3 py-2 text-[10px] font-black tracking-[0.18em] uppercase transition-colors hover:bg-white hover:text-black md:text-xs"
+                >
+                  View project
+                </Link>
+              )}
             </div>
 
             {nextId && (
