@@ -24,8 +24,8 @@ const beats = [
   { f: 116, x: 4670, y: 2320, z: 2.42 }, // horizontal close-up
   { f: 146, x: 4670, y: 1080, z: 1.62 }, // vertical pull up
   { f: 176, x: 3040, y: 1080, z: 2.35 }, // horizontal pull back
-  { f: 208, x: 1440, y: 2860, z: 1.9 }, // diagonal down-left
-  { f: 240, x: 1440, y: 3320, z: 3.05 }, // macro detail
+  { f: 208, x: 1440, y: 1860, z: 1.9 }, // diagonal down-left (shifted higher)
+  { f: 240, x: 1440, y: 2150, z: 2.475 }, // macro detail (50% up, shifted higher)
   { f: 272, x: 3440, y: 3320, z: 1.78 }, // long horizontal drag
   { f: 308, x: 2800, y: 2000, z: 0.54 }, // full-board reveal
   { f: 360, x: 760, y: 620, z: 1.06 },
@@ -46,9 +46,10 @@ export function YonkoLevelReel() {
   const targetY = valueAt(frame, "y");
   const zoom = valueAt(frame, "z");
 
-  const handJitterX = Math.sin(frame * 0.83) * 2.2 + Math.sin(frame * 0.31) * 1.2;
-  const handJitterY = Math.cos(frame * 0.71) * 2;
-  const exposureFlicker = 0.032 + Math.sin(frame * 0.19) * 0.012;
+  // Dry tripod camera — no hand shake, no exposure flicker.
+  const handJitterX = 0;
+  const handJitterY = 0;
+  const exposureFlicker = 0.03;
 
   return (
     <div style={{ width: W, height: H, overflow: "hidden", background: "#d4d0c2" }}>
