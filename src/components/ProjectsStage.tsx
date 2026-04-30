@@ -1,91 +1,180 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { projects } from "@/data/projects";
 import StageVideo from "./StageVideo";
 
+const ANIM_LOCK_MS = 500;
+const WHEEL_PAUSE_MS = 120;
+const WHEEL_SPIKE_RATIO = 1.5;
+const WHEEL_SPIKE_FLOOR = 30;
+const TOUCH_THRESHOLD = 30;
+
 export default function ProjectsStage() {
-  const total = projects.length;
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const animLockRef = useRef(false);
+  const lastWheelTimeRef = useRef(0);
+  const lastWheelDeltaRef = useRef(0);
+  const lastWheelDirectionRef = useRef(0);
+  const touchStartY = useRef<number | null>(null);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const sections = () =>
+      Array.from(el.querySelectorAll<HTMLElement>("[data-snap]"));
+
+    const stepTo = (direction: 1 | -1) => {
+      if (animLockRef.current) return;
+      const items = sections();
+      if (items.length === 0) return;
+      const height = el.clientHeight;
+      const currentIdx = Math.round(el.scrollTop / height);
+      const nextIdx = Math.max(
+        0,
+        Math.min(items.length - 1, currentIdx + direction)
+      );
+      if (nextIdx === currentIdx) return;
+      animLockRef.current = true;
+      items[nextIdx].scrollIntoView({ behavior: "smooth", block: "start" });
+      window.setTimeout(() => {
+        animLockRef.current = false;
+      }, ANIM_LOCK_MS);
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const now = e.timeStamp;
+      const delta = e.deltaY;
+      const absDelta = Math.abs(delta);
+      const direction = delta > 0 ? 1 : -1;
+
+      const dt = now - lastWheelTimeRef.current;
+      const directionChanged = direction !== lastWheelDirectionRef.current;
+      const isPause = dt > WHEEL_PAUSE_MS;
+      const isSpike =
+        absDelta >= WHEEL_SPIKE_FLOOR &&
+        absDelta > Math.abs(lastWheelDeltaRef.current) * WHEEL_SPIKE_RATIO;
+
+      lastWheelTimeRef.current = now;
+      lastWheelDeltaRef.current = delta;
+      lastWheelDirectionRef.current = direction;
+
+      if (!(isPause || isSpike || directionChanged)) return;
+
+      stepTo(direction as 1 | -1);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0].clientY;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (touchStartY.current == null) return;
+      const dy = touchStartY.current - e.changedTouches[0].clientY;
+      touchStartY.current = null;
+      if (Math.abs(dy) < TOUCH_THRESHOLD) return;
+      stepTo(dy > 0 ? 1 : -1);
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        stepTo(1);
+      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        stepTo(-1);
+      }
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
+  const advanceTo = (id: string) => {
+    if (animLockRef.current) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    animLockRef.current = true;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => {
+      animLockRef.current = false;
+    }, ANIM_LOCK_MS);
+  };
 
   return (
     <div
-      className="relative isolate mx-[30px] mb-[30px] min-h-0 flex-1 overflow-y-auto rounded-sm snap-y snap-mandatory"
-      style={{ backgroundColor: "var(--color-pale-blue)" }}
+      ref={scrollerRef}
+      className="relative isolate mx-[20px] mb-[120px] min-h-0 flex-1 overflow-hidden scroll-smooth rounded-sm md:mx-[30px] md:mb-[30px]"
     >
       {projects.map((project, i) => {
-        const isLast = i === total - 1;
+        const next = projects[i + 1];
+        const nextId = next ? `project-${next.id}` : null;
         return (
           <section
             key={project.id}
-            id={`project-${project.number}`}
-            className="snap-start relative flex h-full w-full items-center justify-center overflow-hidden px-8 py-8 md:px-12 md:py-10"
-            style={{ color: "var(--color-black)" }}
+            id={`project-${project.id}`}
+            data-snap
+            className="relative flex h-full w-full items-end justify-center overflow-hidden"
           >
             <StageVideo src={project.videoUrl} />
 
-            <div className="absolute inset-0 bg-white/30 mix-blend-lighten" />
-
-            <div className="absolute top-6 left-6 z-10 flex flex-col gap-1 text-xs font-bold tracking-[0.18em] uppercase md:left-10 md:text-sm">
-              <span>{project.tags.join(" / ")}</span>
-              <span>For: {project.client}</span>
+            <div className="absolute top-6 left-6 z-10 flex flex-col gap-1 text-white md:top-8 md:left-8">
+              <span className="text-sm font-black tracking-[0.12em] uppercase md:text-base">
+                {project.name}
+              </span>
+              <span className="text-[10px] font-bold tracking-[0.18em] uppercase opacity-80 md:text-xs">
+                {project.tags.join(" / ")}
+              </span>
             </div>
 
-            <div className="absolute top-6 right-6 z-10 text-[10px] font-bold tracking-[0.2em] uppercase opacity-50 md:right-10">
-              {project.number} / {String(total).padStart(2, "0")}
-            </div>
-
-            <motion.h2
-              className="font-heading relative z-10 text-[10vw] leading-[0.9] font-black tracking-[0.04em] uppercase md:text-[7vw]"
-              style={{ mixBlendMode: "difference", color: "#ffffff" }}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ amount: 0.6, once: false }}
-              transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              {project.title}
-            </motion.h2>
-
-            {!isLast && (
-              <div className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-[10px] font-bold tracking-[0.2em] uppercase opacity-80">
-                <span>↓ Next project</span>
-                <motion.div
-                  className="h-5 w-px"
-                  style={{ background: "var(--accent)" }}
-                  animate={{ scaleY: [0.4, 1, 0.4] }}
-                  transition={{
-                    duration: 1.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              </div>
+            {nextId && (
+              <motion.a
+                href={`#${nextId}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  advanceTo(nextId);
+                }}
+                className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 text-white transition-opacity hover:opacity-70"
+                aria-label={`Go to next project ${next?.name}`}
+                animate={{ y: [0, 4, 0] }}
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <svg
+                  width="22"
+                  height="12"
+                  viewBox="0 0 22 12"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1 1L11 10L21 1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </motion.a>
             )}
           </section>
         );
       })}
-
-      <section
-        id="about"
-        className="snap-start relative flex h-full w-full items-center justify-center px-8 py-8 md:px-12 md:py-10"
-        style={{ color: "var(--color-black)" }}
-      >
-        <div className="absolute top-6 left-6 text-xs font-bold tracking-[0.18em] uppercase md:left-10 md:text-sm">
-          About
-        </div>
-        <div className="flex max-w-[60ch] flex-col items-start gap-6 text-left">
-          <p className="text-base leading-relaxed md:text-lg">
-            DICID is a one-person studio working at the intersection of brand
-            strategy and web design. Selected projects above. Drop a line if a
-            collaboration is calling.
-          </p>
-          <a
-            href="mailto:hello@dicid.tbd"
-            className="dicid-link text-sm font-bold tracking-[0.18em] uppercase"
-          >
-            hello@dicid.tbd
-          </a>
-        </div>
-      </section>
     </div>
   );
 }

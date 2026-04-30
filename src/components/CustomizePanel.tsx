@@ -1,104 +1,177 @@
 "use client";
 
 import { useEffect } from "react";
-import { Leva, useControls } from "leva";
+import { motion } from "framer-motion";
+import { setCustomise, useCustomise } from "@/lib/customise";
 
-type ColorPreset = { bg: string; fg: string };
-
-const COLOR_PRESETS: Record<string, ColorPreset> = {
-  "Pale Blue": { bg: "#dee8ff", fg: "#000000" },
-  Orange: { bg: "#f26a1b", fg: "#000000" },
-  "Deep Blue": { bg: "#2f5d8c", fg: "#ffffff" },
-  Black: { bg: "#000000", fg: "#ffffff" },
-  "Electric Blue": { bg: "#2e6fed", fg: "#ffffff" },
-  Green: { bg: "#58e166", fg: "#000000" },
+type FontOption = {
+  id: string;
+  cssVar: string;
 };
 
-const PAGE_BG_OPTIONS: Record<string, string> = Object.fromEntries(
-  Object.entries(COLOR_PRESETS).map(([k, v]) => [k, v.bg])
-);
+const FONTS: FontOption[] = [
+  { id: "sans", cssVar: "var(--font-sans)" },
+  { id: "blackletter", cssVar: "var(--font-blackletter)" },
+  { id: "serif", cssVar: "var(--font-serif)" },
+  { id: "handwritten", cssVar: "var(--font-handwritten)" },
+];
 
-const ACCENT_OPTIONS: Record<string, string> = {
-  Orange: "#f26a1b",
-  "Electric Blue": "#2e6fed",
-  Green: "#58e166",
-  "Deep Blue": "#2f5d8c",
-  Black: "#000000",
+type ColorOption = {
+  id: string;
+  bg: string;
+  fg: string;
 };
 
-const FONT_OPTIONS = {
-  "Proxima Nova": "var(--font-sans)",
-  "Jacques François": "var(--font-serif)",
-  "Sister Spray": "var(--font-handwritten)",
-  Blackletter: "var(--font-blackletter)",
-};
+const COLORS: ColorOption[] = [
+  { id: "light", bg: "#eef0f3", fg: "#000000" },
+  { id: "orange", bg: "#f26a1b", fg: "#000000" },
+  { id: "blue", bg: "#2e6fed", fg: "#ffffff" },
+  { id: "navy", bg: "#0a1736", fg: "#ffffff" },
+];
 
-function fgForBg(bg: string): string {
-  const match = Object.values(COLOR_PRESETS).find((p) => p.bg === bg);
-  return match?.fg ?? "#000000";
+function FontButton({
+  font,
+  isActive,
+  size,
+  onClick,
+}: {
+  font: FontOption;
+  isActive: boolean;
+  size: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Use ${font.id} font`}
+      className="flex items-center justify-center rounded-full border font-bold leading-none transition-all"
+      style={{
+        fontFamily: font.cssVar,
+        backgroundColor: isActive ? "var(--page-fg)" : "transparent",
+        color: isActive ? "var(--page-bg)" : "var(--page-fg)",
+        borderColor: "var(--page-fg)",
+        height: size,
+        width: size,
+        fontSize: Math.round(size * 0.46),
+      }}
+    >
+      T
+    </button>
+  );
 }
 
-export default function CustomizePanel() {
-  const { pageBg, headingFont, accent } = useControls("Customise", {
-    pageBg: {
-      label: "Page bg",
-      value: COLOR_PRESETS.Black.bg,
-      options: PAGE_BG_OPTIONS,
-    },
-    headingFont: {
-      label: "Typography",
-      value: FONT_OPTIONS.Blackletter,
-      options: FONT_OPTIONS,
-    },
-    accent: {
-      label: "Accent",
-      value: ACCENT_OPTIONS.Orange,
-      options: ACCENT_OPTIONS,
-    },
-  });
+function ColorButton({
+  color,
+  isActive,
+  size,
+  onClick,
+}: {
+  color: ColorOption;
+  isActive: boolean;
+  size: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Use ${color.id} colour`}
+      className="rounded-full transition-shadow"
+      style={{
+        backgroundColor: color.bg,
+        height: size,
+        width: size,
+        boxShadow: isActive
+          ? "0 0 0 2px var(--page-bg), 0 0 0 3px var(--page-fg)"
+          : "0 0 0 1px var(--page-fg)",
+      }}
+    />
+  );
+}
 
+function useApplyCustomise() {
+  const { font, color } = useCustomise();
   useEffect(() => {
+    const f = FONTS.find((x) => x.id === font) ?? FONTS[0];
+    const c = COLORS.find((x) => x.id === color) ?? COLORS[0];
     const root = document.documentElement;
-    root.style.setProperty("--page-bg", pageBg);
-    root.style.setProperty("--page-fg", fgForBg(pageBg));
-    root.style.setProperty("--font-heading-active", headingFont);
-    root.style.setProperty("--accent", accent);
-  }, [pageBg, headingFont, accent]);
+    root.style.setProperty("--font-heading-active", f.cssVar);
+    root.style.setProperty("--page-bg", c.bg);
+    root.style.setProperty("--page-fg", c.fg);
+    root.style.setProperty("--accent", "#f26a1b");
+  }, [font, color]);
+}
+
+export function CustomizePanelDesktop() {
+  useApplyCustomise();
+  const { font, color } = useCustomise();
 
   return (
-    <>
-      <Leva
-        titleBar={{ title: "CUSTOMISE", drag: true, filter: false }}
-        collapsed={false}
-        theme={{
-          sizes: {
-            rootWidth: "240px",
-            controlWidth: "120px",
-          },
-          colors: {
-            elevation1: "#ffffff",
-            elevation2: "#f5f5f5",
-            elevation3: "#eaeaea",
-            accent1: "#9b5cf6",
-            accent2: "#9b5cf6",
-            accent3: "#9b5cf6",
-            highlight1: "#000000",
-            highlight2: "#000000",
-            highlight3: "#000000",
-          },
-          fontSizes: {
-            root: "11px",
-          },
-        }}
-      />
-      <div className="pointer-events-none fixed top-3 left-[260px] z-[1001] flex items-center gap-1 select-none">
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#9b5cf6] text-[10px] font-bold text-white">
-          D
-        </span>
-        <span className="-ml-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#5a667a] text-[10px] font-bold text-white">
-          R
-        </span>
+    <div className="flex flex-col items-end gap-2">
+      <div className="flex gap-2">
+        {FONTS.map((f) => (
+          <FontButton
+            key={f.id}
+            font={f}
+            size={28}
+            isActive={f.id === font}
+            onClick={() => setCustomise({ font: f.id })}
+          />
+        ))}
       </div>
-    </>
+      <div className="flex gap-2">
+        {COLORS.map((c) => (
+          <ColorButton
+            key={c.id}
+            color={c}
+            size={28}
+            isActive={c.id === color}
+            onClick={() => setCustomise({ color: c.id })}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CustomizePanelMobile() {
+  const { font, color } = useCustomise();
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-3 z-50 flex justify-center md:hidden">
+      <motion.div
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 240, damping: 22, delay: 0.3 }}
+        className="pointer-events-auto flex flex-col items-center gap-2 rounded-3xl border border-white/40 bg-white/70 px-5 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.18)] backdrop-blur-xl"
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+      >
+        <div className="-mt-1 mb-1 h-1 w-10 rounded-full bg-black/25" />
+
+        <div className="flex gap-3">
+          {FONTS.map((f) => (
+            <FontButton
+              key={f.id}
+              font={f}
+              size={36}
+              isActive={f.id === font}
+              onClick={() => setCustomise({ font: f.id })}
+            />
+          ))}
+        </div>
+        <div className="flex gap-3">
+          {COLORS.map((c) => (
+            <ColorButton
+              key={c.id}
+              color={c}
+              size={32}
+              isActive={c.id === color}
+              onClick={() => setCustomise({ color: c.id })}
+            />
+          ))}
+        </div>
+      </motion.div>
+    </div>
   );
 }

@@ -3,7 +3,7 @@ import ProjectsStage from "@/components/ProjectsStage";
 
 export default function Home() {
   return (
-    <main className="flex h-screen w-full flex-col overflow-hidden">
+    <main className="flex h-[100dvh] w-full flex-col overflow-hidden">
       <Header />
       <ProjectsStage />
     </main>

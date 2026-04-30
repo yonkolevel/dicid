@@ -9,17 +9,22 @@
   --color-green: #58e166;
   --color-bg: #eef0f3;
 
-  --font-sans: var(--font-proxima), "Inter", system-ui, sans-serif;
-  --font-serif: var(--font-jacques), "Times New Roman", serif;
-  --font-handwritten: var(--font-sister), "Permanent Marker", cursive;
-  --font-blackletter: var(--font-blackletter-source), "UnifrakturCook", serif;
+  --font-sans: "proxima-nova", system-ui, sans-serif;
+  --font-serif: var(--font-jacques), "Jacques Francois", "Times New Roman", serif;
+  --font-handwritten: var(--font-sister), cursive;
+  --font-blackletter: var(--font-vorname), serif;
 }
 
 :root {
-  --page-bg: #dee8ff;
+  --page-bg: #eef0f3;
   --page-fg: #000000;
   --accent: #f26a1b;
   --font-heading-active: var(--font-sans);
+}
+
+html,
+body {
+  overscroll-behavior: none;
 }
 
 html {

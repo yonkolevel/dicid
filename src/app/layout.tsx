@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Jacques_Francois, Permanent_Marker, UnifrakturCook } from "next/font/google";
+import { Jacques_Francois } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
-import CustomizePanel from "@/components/CustomizePanel";
-
-// TODO(dicid): swap Inter for self-hosted Proxima Nova once .woff2 is supplied.
-const proximaFallback = Inter({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-proxima",
-});
+import { CustomizePanelMobile } from "@/components/CustomizePanel";
 
 const jacques = Jacques_Francois({
   subsets: ["latin"],
@@ -16,17 +10,16 @@ const jacques = Jacques_Francois({
   variable: "--font-jacques",
 });
 
-// TODO(dicid): swap Permanent Marker for self-hosted Sister Spray once .woff2 is supplied.
-const sisterFallback = Permanent_Marker({
-  subsets: ["latin"],
-  weight: "400",
+const sisterSpray = localFont({
+  src: "../../public/fonts/SisterSpray.ttf",
   variable: "--font-sister",
+  display: "swap",
 });
 
-const blackletter = UnifrakturCook({
-  subsets: ["latin"],
-  weight: "700",
-  variable: "--font-blackletter-source",
+const vorname = localFont({
+  src: "../../public/fonts/Vorname.ttf",
+  variable: "--font-vorname",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -42,11 +35,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${proximaFallback.variable} ${jacques.variable} ${sisterFallback.variable} ${blackletter.variable}`}
+      className={`${jacques.variable} ${sisterSpray.variable} ${vorname.variable}`}
     >
+      <head>
+        {/* Proxima Nova via Adobe Typekit */}
+        <link rel="stylesheet" href="https://use.typekit.net/cxs7cow.css" />
+      </head>
       <body className="min-h-screen">
         {children}
-        <CustomizePanel />
+        <CustomizePanelMobile />
       </body>
     </html>
   );
