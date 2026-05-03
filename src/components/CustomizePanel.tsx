@@ -11,9 +11,9 @@ type FontOption = {
 
 const FONTS: FontOption[] = [
   { id: "sans", cssVar: "var(--font-sans)" },
-  { id: "blackletter", cssVar: "var(--font-blackletter)" },
   { id: "serif", cssVar: "var(--font-serif)" },
   { id: "handwritten", cssVar: "var(--font-handwritten)" },
+  { id: "blackletter", cssVar: "var(--font-blackletter)" },
 ];
 
 type ColorOption = {
@@ -45,7 +45,9 @@ function FontButton({
       type="button"
       onClick={onClick}
       aria-label={`Use ${font.id} font`}
-      className="flex items-center justify-center rounded-full border font-bold leading-none transition-all"
+      className={`flex items-center justify-center rounded-full font-bold transition-all overflow-hidden ${
+        isActive ? "" : "border"
+      }`}
       style={{
         fontFamily: font.cssVar,
         backgroundColor: isActive ? "var(--page-fg)" : "transparent",
@@ -53,10 +55,12 @@ function FontButton({
         borderColor: "var(--page-fg)",
         height: size,
         width: size,
-        fontSize: Math.round(size * 0.46),
+        fontSize: 17,
+        lineHeight: 1,
+        padding: 0,
       }}
     >
-      T
+      <span style={{ marginTop: -1 }}>T</span>
     </button>
   );
 }
@@ -108,24 +112,51 @@ export function CustomizePanelDesktop() {
   const { font, color } = useCustomise();
 
   return (
-    <div className="flex flex-col items-end gap-2">
+    <div className="flex flex-col items-start gap-1">
+      {/* Row 1: Customise label */}
+      <span
+        className="font-bold uppercase tracking-wide"
+        style={{ fontFamily: "var(--font-heading-active)", fontSize: 20 }}
+      >
+        Customise:
+      </span>
+
+      {/* Row 2: Typography label */}
+      <span
+        className="text-xs font-medium uppercase tracking-wide opacity-60"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
+        Typography
+      </span>
+
+      {/* Row 3: Font buttons */}
       <div className="flex gap-2">
         {FONTS.map((f) => (
           <FontButton
             key={f.id}
             font={f}
-            size={28}
+            size={24}
             isActive={f.id === font}
             onClick={() => setCustomise({ font: f.id })}
           />
         ))}
       </div>
+
+      {/* Row 4: Color label */}
+      <span
+        className="text-xs font-medium uppercase tracking-wide opacity-60"
+        style={{ fontFamily: "var(--font-sans)" }}
+      >
+        Color
+      </span>
+
+      {/* Row 5: Color buttons */}
       <div className="flex gap-2">
         {COLORS.map((c) => (
           <ColorButton
             key={c.id}
             color={c}
-            size={28}
+            size={24}
             isActive={c.id === color}
             onClick={() => setCustomise({ color: c.id })}
           />
