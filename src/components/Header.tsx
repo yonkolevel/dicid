@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CustomizePanelDesktop } from "./CustomizePanel";
 
 const MISSION = `Design shapes our world, blending form and function. Its impact is profound, influencing how we live and interact. Creativity fuels innovation, driving progress and sparking inspiration. Development evolves design, adapting to changing needs. Together, they propel us forward, shaping a brighter future.`;
@@ -8,13 +9,13 @@ export default function Header() {
       className="grid w-full shrink-0 grid-cols-[auto_1fr_auto] items-start gap-4 px-[20px] pt-5 pb-2 md:grid-cols-[auto_1fr_auto_auto] md:gap-10 md:px-[30px] md:pt-8 md:pb-3"
       style={{ color: "var(--page-fg)" }}
     >
-      <a
+      <Link
         href="/"
         className="font-heading text-[14vw] leading-[0.85] font-black tracking-[-0.04em] no-underline md:text-[6vw]"
         style={{ color: "var(--page-fg)" }}
       >
         DICID
-      </a>
+      </Link>
 
       <p
         className="hidden self-start pt-2 text-[10px] font-bold tracking-[0.05em] uppercase leading-[1.45] md:block md:text-[11px]"
