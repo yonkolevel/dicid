@@ -7,12 +7,15 @@ import { setCustomise, useCustomise } from "@/lib/customise";
 type FontOption = {
   id: string;
   cssVar: string;
+  labelSize?: number;
+  labelWeight?: number | string;
+  offsetY?: number;
 };
 
 const FONTS: FontOption[] = [
-  { id: "sans", cssVar: "var(--font-sans)" },
-  { id: "serif", cssVar: "var(--font-serif)" },
-  { id: "handwritten", cssVar: "var(--font-handwritten)" },
+  { id: "sans",        cssVar: "var(--font-sans)" },
+  { id: "serif",       cssVar: "var(--font-serif)" },
+  { id: "handwritten", cssVar: "var(--font-handwritten)", labelSize: 6, labelWeight: 100, offsetY: 3 },
   { id: "blackletter", cssVar: "var(--font-blackletter)" },
 ];
 
@@ -45,22 +48,33 @@ function FontButton({
       type="button"
       onClick={onClick}
       aria-label={`Use ${font.id} font`}
-      className={`flex items-center justify-center rounded-full font-bold transition-all overflow-hidden ${
-        isActive ? "" : "border"
-      }`}
+      className="relative overflow-hidden rounded-full font-bold transition-colors"
       style={{
         fontFamily: font.cssVar,
-        backgroundColor: isActive ? "var(--page-fg)" : "transparent",
-        color: isActive ? "var(--page-bg)" : "var(--page-fg)",
-        borderColor: "var(--page-fg)",
+        backgroundColor: "transparent",
+        color: "var(--page-fg)",
+        border: `${isActive ? 3 : 1}px solid var(--page-fg)`,
+        boxSizing: "border-box",
         height: size,
         width: size,
-        fontSize: 17,
-        lineHeight: 1,
         padding: 0,
       }}
     >
-      <span style={{ marginTop: -1 }}>T</span>
+      <span
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: `translate(-50%, calc(-50% + ${font.offsetY ?? 0}px))`,
+          fontSize: font.labelSize ?? 17,
+          fontWeight: font.labelWeight ?? "bold",
+          lineHeight: 0,
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        T
+      </span>
     </button>
   );
 }
@@ -81,14 +95,13 @@ function ColorButton({
       type="button"
       onClick={onClick}
       aria-label={`Use ${color.id} colour`}
-      className="rounded-full transition-shadow"
+      className="rounded-full transition-colors"
       style={{
         backgroundColor: color.bg,
+        border: `${isActive ? 3 : 1}px solid var(--page-fg)`,
+        boxSizing: "border-box",
         height: size,
         width: size,
-        boxShadow: isActive
-          ? "0 0 0 2px var(--page-bg), 0 0 0 3px var(--page-fg)"
-          : "0 0 0 1px var(--page-fg)",
       }}
     />
   );
@@ -112,25 +125,25 @@ export function CustomizePanelDesktop() {
   const { font, color } = useCustomise();
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-end gap-[6px] md:items-start md:gap-1">
       {/* Row 1: Customise label */}
       <span
-        className="font-bold uppercase tracking-wide"
-        style={{ fontFamily: "var(--font-heading-active)", fontSize: 20 }}
+        className="hidden font-bold uppercase tracking-wide md:inline"
+        style={{ fontFamily: "var(--font-sans)", fontSize: 20, lineHeight: "24px" }}
       >
         Customise:
       </span>
 
       {/* Row 2: Typography label */}
       <span
-        className="text-xs font-medium uppercase tracking-wide opacity-60"
+        className="hidden text-xs font-medium uppercase tracking-wide opacity-60 md:inline"
         style={{ fontFamily: "var(--font-sans)" }}
       >
         Typography
       </span>
 
       {/* Row 3: Font buttons */}
-      <div className="flex gap-2">
+      <div className="flex gap-[6px] md:gap-2">
         {FONTS.map((f) => (
           <FontButton
             key={f.id}
@@ -144,14 +157,14 @@ export function CustomizePanelDesktop() {
 
       {/* Row 4: Color label */}
       <span
-        className="text-xs font-medium uppercase tracking-wide opacity-60"
+        className="hidden text-xs font-medium uppercase tracking-wide opacity-60 md:inline"
         style={{ fontFamily: "var(--font-sans)" }}
       >
         Color
       </span>
 
       {/* Row 5: Color buttons */}
-      <div className="flex gap-2">
+      <div className="flex gap-[6px] md:gap-2">
         {COLORS.map((c) => (
           <ColorButton
             key={c.id}
@@ -185,7 +198,7 @@ export function CustomizePanelMobile() {
             <FontButton
               key={f.id}
               font={f}
-              size={36}
+              size={24}
               isActive={f.id === font}
               onClick={() => setCustomise({ font: f.id })}
             />
@@ -196,7 +209,7 @@ export function CustomizePanelMobile() {
             <ColorButton
               key={c.id}
               color={c}
-              size={32}
+              size={24}
               isActive={c.id === color}
               onClick={() => setCustomise({ color: c.id })}
             />

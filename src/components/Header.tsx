@@ -1,30 +1,38 @@
-import Link from "next/link";
 import { CustomizePanelDesktop } from "./CustomizePanel";
+import SiteLogo from "./SiteLogo";
 
 const MISSION = `Design shapes our world, blending form and function. Its impact is profound, influencing how we live and interact. Creativity fuels innovation, driving progress and sparking inspiration. Development evolves design, adapting to changing needs. Together, they propel us forward, shaping a brighter future.`;
 
 export default function Header() {
   return (
     <header
-      className="grid w-full shrink-0 grid-cols-[auto_1fr_auto] items-start gap-4 px-[20px] pt-5 pb-2 md:grid-cols-[auto_1fr_auto_1fr_auto] md:gap-10 md:px-[30px] md:pt-8 md:pb-3"
+      className="grid h-[180px] w-full shrink-0 grid-cols-[1fr_auto] items-start gap-4 p-[30px] md:grid-cols-[auto_1fr_auto_1fr_auto] md:gap-10"
       style={{ color: "var(--page-fg)" }}
     >
-      <Link
-        href="/"
-        className="font-heading text-[14vw] leading-[0.85] font-black tracking-[-0.04em] no-underline md:text-[6vw]"
-        style={{ color: "var(--page-fg)" }}
-      >
-        DICID
-      </Link>
+      <div className="flex h-full flex-col items-start justify-start gap-2 md:contents">
+        <SiteLogo />
+
+        <nav className="flex shrink-0 gap-7 text-base leading-none tracking-[0.02em] md:hidden">
+          <a href="/about" className="transition-opacity hover:opacity-60">
+            About
+          </a>
+          <a
+            href="mailto:hello@dicid.tbd"
+            className="transition-opacity hover:opacity-60"
+          >
+            Contact
+          </a>
+        </nav>
+      </div>
 
       <p
-        className="hidden self-start pt-2 text-[10px] font-bold tracking-[0.05em] uppercase leading-[1.45] md:block md:text-[11px]"
+        className="hidden h-full overflow-hidden text-[10px] font-bold leading-[1.45] tracking-[0.05em] uppercase md:block md:text-[11px]"
         style={{ textAlign: "justify" }}
       >
         {MISSION}
       </p>
 
-      <nav className="flex shrink-0 gap-4 self-start pt-2 text-xs font-bold tracking-[0.05em] uppercase md:gap-6 md:text-base">
+      <nav className="hidden shrink-0 gap-4 self-start pt-2 text-xs font-bold tracking-[0.05em] uppercase md:flex md:gap-6 md:text-base">
         <a href="/about" className="transition-opacity hover:opacity-60">
           About
         </a>
@@ -39,7 +47,7 @@ export default function Header() {
 
       <div className="hidden md:block" aria-hidden="true" />
 
-      <div className="hidden md:block">
+      <div className="justify-self-end">
         <CustomizePanelDesktop />
       </div>
     </header>

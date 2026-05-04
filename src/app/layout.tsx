@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Jacques_Francois } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import { CustomizePanelMobile } from "@/components/CustomizePanel";
 import DevDesignInspector from "@/components/DevDesignInspector";
 
 const jacques = Jacques_Francois({
@@ -44,7 +43,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen">
         {children}
-        <CustomizePanelMobile />
         {process.env.NODE_ENV === "development" && <DevDesignInspector />}
       </body>
     </html>
