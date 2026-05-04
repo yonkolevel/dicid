@@ -6,7 +6,7 @@ const MISSION = `Design shapes our world, blending form and function. Its impact
 export default function Header() {
   return (
     <header
-      className="grid w-full shrink-0 grid-cols-[auto_1fr_auto] items-start gap-4 px-[20px] pt-5 pb-2 md:grid-cols-[auto_1fr_auto_auto] md:gap-10 md:px-[30px] md:pt-8 md:pb-3"
+      className="grid w-full shrink-0 grid-cols-[auto_1fr_auto] items-start gap-4 px-[20px] pt-5 pb-2 md:grid-cols-[auto_1fr_auto_1fr_auto] md:gap-10 md:px-[30px] md:pt-8 md:pb-3"
       style={{ color: "var(--page-fg)" }}
     >
       <Link
@@ -36,6 +36,8 @@ export default function Header() {
           Contact
         </a>
       </nav>
+
+      <div className="hidden md:block" aria-hidden="true" />
 
       <div className="hidden md:block">
         <CustomizePanelDesktop />
